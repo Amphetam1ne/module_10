@@ -1,0 +1,37 @@
+import threading
+import time
+
+
+class Knight(threading.Thread):
+    def __init__(self, name, power):
+        threading.Thread.__init__(self)
+        self.name = name
+        self.power = power
+        self.enemies = 100
+        self.days = 0  # Количество дней сражения
+
+    def run(self):
+        print(f'{self.name}, на нас напали!')
+        while self.enemies > 0:
+            self.days += 1
+            self.enemies -= self.power
+            if self.enemies < 0:
+                self.enemies = 0
+            print(f'{self.name} сражается {self.days} день(дня)..., осталось {self.enemies} воинов.')
+            time.sleep(1)
+        print(f'{self.name} одержал победу спустя {self.days} дней(дня)!')
+
+
+# Создание объектов класса Knight
+f_1 = Knight('Sir Lancelot', 10)
+f_2 = Knight('Sir Galahad', 20)
+
+# Запуск потоков
+f_1.start()
+f_2.start()
+
+# Завершения потоков
+f_1.join()
+f_2.join()
+
+print('Все битвы закончились!')
