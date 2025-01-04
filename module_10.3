@@ -1,0 +1,52 @@
+import threading
+import time
+from random import randint
+
+class Bank:
+    def __init__(self):
+        self.balance = 0
+        self.lock = threading.Lock()
+
+    def deposit(self):
+        '''пополнение баланса '''
+        for _ in range(100):
+            secret_number = randint(50, 500)
+            with self.lock:
+                self.balance += secret_number
+                print(f"Пополнение: {secret_number}. Баланс: {self.balance}")
+                if self.balance >= 500:
+                    self.lock.release()
+
+            time.sleep(0.001)
+
+    def take(self):
+        '''Снятие с баланса'''
+        for _ in range(100):
+            secret_number = randint(50, 500)
+            print(f"Запрос на {secret_number}")
+            with self.lock:
+                if secret_number <= self.balance:
+                    self.balance -= secret_number
+                    print(f"Снятие: {secret_number}. Баланс: {self.balance}")
+                else:
+                    print("Запрос отклонён, недостаточно средств")
+                    self.lock.acquire()
+
+            time.sleep(0.001)
+
+bk = Bank()
+
+# Создание потоков
+th1 = threading.Thread(target=bk.deposit)
+th2 = threading.Thread(target=bk.take)
+
+# Запуск потоков
+th1.start()
+th2.start()
+
+# Ожидание завершения потоков
+th1.join()
+th2.join()
+
+
+print(f"Итоговый баланс: {bk.balance}")
